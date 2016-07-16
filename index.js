@@ -1,22 +1,23 @@
 var express = require('express');
+var bodyParser = require('body-parser')
 
-var db = require('./db');
-var jobexe = require('./jobexe');
+var db = require('./util/db');
+
+var jobs = require('./routes/jobs');
+var params = require('./routes/params');
 
 db.connect();
 
 var app = express();
 
+app.use(bodyParser.json());
+app.use('/buildtool/res/jobs', jobs);
+app.use('/buildtool/res/params', params);
+
 app.get('/', function (req, res) {
-  res.send('Info: Root is <a href="/buildtool">/buildtool!</a>');
+  res.send('Resources at:<br/>/buildtool/res/jobs/&lt;unit&gt;/&lt;job&gt;<br/>/buildtool/res/params/&lt;unit&gt;/&lt;param&gt;');
 });
-
-app.get('/buildtool', function (req, res) {
-  res.send('Info: Jobs Resources at <a href="/buildtool/res/jobs/unit/">/buildtool/res/jobs/&lt;unit&gt;</a>');
-});
-
-app.use('/buildtool/res/jobs', jobexe);
 
 app.listen(3000, function () {
-  console.log('Example app listening on port 3000!');
+  console.log('Buildtool server listening on port 3000.');
 });
