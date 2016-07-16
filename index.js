@@ -18,6 +18,6 @@ app.get('/', function (req, res) {
   res.send('Resources at:<br/>/buildtool/res/jobs/&lt;unit&gt;/&lt;job&gt;<br/>/buildtool/res/params/&lt;unit&gt;/&lt;param&gt;');
 });
 
-app.listen(3000, function () {
-  console.log('Buildtool server listening on port 3000.');
+app.listen(3002, function () {
+  console.log('Buildtool server listening on port 3002.');
 });
