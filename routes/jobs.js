@@ -5,7 +5,7 @@ var notifier = require('../util/notifier');
 var router = express.Router();
 
 function getJobExes(req, res, query) {
-  db.connection().collection('jobexe').find(query).toArray(function(err, result) {
+  db.connection().collection('jobexe').find(query).sort({lastmodified:-1}).toArray(function(err, result) {
     if (err) throw err;
     if (result.length == 0 && req.query.wait) {
       notifier.addObserver(req.params.unit.toLowerCase(), function() {
