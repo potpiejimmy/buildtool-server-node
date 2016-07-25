@@ -4,6 +4,10 @@ var notifier = require('../util/notifier');
 
 var router = express.Router();
 
+router.get('/', function(req, res) {
+  db.connection().collection('jobexe').distinct('unit', function(err, result) {res.send(result);});
+});
+
 function getJobExes(req, res, query) {
   db.connection().collection('jobexe').find(query).sort({lastmodified:-1}).toArray(function(err, result) {
     if (err) throw err;
