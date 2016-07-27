@@ -3,6 +3,13 @@ var db = require('../util/db');
 
 var router = express.Router();
 
+router.get('/', function(req, res) {
+  db.connection().collection('unitparam').find().toArray(function(err, param) {
+      if (err) throw err;
+      res.send(param);
+  });
+});
+
 router.get('/:unit/:name', function(req, res) {
   var query = {"unit":req.params.unit.toLowerCase(), "name":req.params.name};
   db.connection().collection('unitparam').findOne(query, function(err, param) {
