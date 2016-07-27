@@ -27,4 +27,12 @@ router.post('/:unit/:name', function(req, res) {
   res.send(param);
 });
 
+router.delete('/:unit/:name', function(req, res) {
+  var query = {"unit":req.params.unit, "name":req.params.name};
+  db.connection().collection('unitparam').deleteMany(query, function(err, result) {
+    if (err) throw err;
+    res.send(result);
+  });
+});
+
 module.exports = router;
