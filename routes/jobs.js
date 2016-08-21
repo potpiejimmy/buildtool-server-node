@@ -40,6 +40,7 @@ router.get('/:unit', function(req, res) {
 router.delete('/:unit', function(req, res) {
   db.connection().collection('jobexe').deleteMany({"unit":req.params.unit.toLowerCase()}, function(err, result) {
     if (err) throw err;
+    changeNotifier.notifyObservers(req.params.unit.toLowerCase());
     res.send(result);
   });
 });
