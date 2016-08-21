@@ -1,18 +1,20 @@
-var observers = {};
-
-function addObserver(key, observer) {
-  if (!(key in observers)) observers[key] = [];
-  observers[key].push(observer);
+/* Constructor */
+function Notifier() {
+    this.observers = {};
 }
 
-function notifyObservers(key, observer) {
-  if (key in observers) {
-    observers[key].forEach(function(element) {
+Notifier.prototype.addObserver = function(key, observer) {
+  if (!(key in this.observers)) this.observers[key] = [];
+  this.observers[key].push(observer);
+}
+
+Notifier.prototype.notifyObservers = function(key, observer) {
+  if (key in this.observers) {
+    this.observers[key].forEach(function(element) {
       element();
     });
-    delete observers[key];
+    delete this.observers[key];
   }
 }
 
-module.exports.addObserver = addObserver;
-module.exports.notifyObservers = notifyObservers;
+module.exports = Notifier;

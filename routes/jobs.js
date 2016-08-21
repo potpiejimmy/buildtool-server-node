@@ -1,6 +1,8 @@
 var express = require('express');
 var db = require('../util/db');
-var notifier = require('../util/notifier');
+var Notifier = require('../util/notifier');
+var pendingNotifier = new Notifier();
+var changeNotifier = new Notifier();
 
 var router = express.Router();
 
@@ -12,7 +14,8 @@ function getJobExes(req, res, query) {
   db.connection().collection('jobexe').find(query).sort({lastmodified:-1}).toArray(function(err, result) {
     if (err) throw err;
     if (result.length == 0 && req.query.wait) {
-      notifier.addObserver(req.params.unit.toLowerCase(), function() {
+      // if empty result and wait=true is set, wait until a new pending entry arrives
+      pendingNotifier.addObserver(req.params.unit.toLowerCase(), function() {
         getJobExes(req, res, query);
       });
     } else {
@@ -24,7 +27,14 @@ function getJobExes(req, res, query) {
 router.get('/:unit', function(req, res) {
   var query = {"unit":req.params.unit.toLowerCase()};
   if (req.query.state) query.state = req.query.state;
-  getJobExes(req, res, query);
+  if (req.query.waitForChange) {
+    // if waitForChange=true is set, wait until notified about a change in data
+    changeNotifier.addObserver(req.params.unit.toLowerCase(), function() {
+      getJobExes(req, res, query);
+    })
+  } else {
+    getJobExes(req, res, query);
+  }
 });
 
 router.delete('/:unit', function(req, res) {
@@ -45,7 +55,10 @@ router.get('/:unit/:name(*)', function(req, res) {
       job.state = req.query.set;
       job.lastmodified = Date.now();
       db.connection().collection('jobexe').update(query, job, {upsert:true});
-      if (req.query.set == "pending") notifier.notifyObservers(req.params.unit.toLowerCase());
+      // notify listeners about new pending entry
+      if (req.query.set == "pending") pendingNotifier.notifyObservers(req.params.unit.toLowerCase());
+      // and about an overall change in data
+      changeNotifier.notifyObservers(req.params.unit.toLowerCase());
     }
     res.send(job);
   });
