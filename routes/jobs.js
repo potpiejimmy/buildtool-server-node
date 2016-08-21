@@ -68,6 +68,7 @@ router.delete('/:unit/:name(*)', function(req, res) {
   var query = {"unit":req.params.unit.toLowerCase(), "name":req.params.name};
   db.connection().collection('jobexe').deleteMany(query, function(err, result) {
     if (err) throw err;
+    changeNotifier.notifyObservers(req.params.unit.toLowerCase());
     res.send(result);
   });
 });
