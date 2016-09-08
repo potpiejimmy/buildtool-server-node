@@ -12,7 +12,7 @@ router.get('/', function(req, res) {
 
 function getJobExes(req, res, query) {
   db.connection().collection('jobexe').find(query).sort({lastmodified:-1}).toArray(function(err, result) {
-    if (err) throw err;
+    if (err) return res.send(err);
     if (result.length == 0 && req.query.wait) {
       // if empty result and wait=true is set, wait until a new pending entry arrives
       pendingNotifier.addObserver(req.params.unit.toLowerCase(), function() {
@@ -39,7 +39,7 @@ router.get('/:unit', function(req, res) {
 
 router.delete('/:unit', function(req, res) {
   db.connection().collection('jobexe').deleteMany({"unit":req.params.unit.toLowerCase()}, function(err, result) {
-    if (err) throw err;
+    if (err) return res.send(err);
     changeNotifier.notifyObservers(req.params.unit.toLowerCase());
     res.send(result);
   });
@@ -68,7 +68,7 @@ router.get('/:unit/:name(*)', function(req, res) {
 router.delete('/:unit/:name(*)', function(req, res) {
   var query = {"unit":req.params.unit.toLowerCase(), "name":req.params.name};
   db.connection().collection('jobexe').deleteMany(query, function(err, result) {
-    if (err) throw err;
+    if (err) return res.send(err);
     changeNotifier.notifyObservers(req.params.unit.toLowerCase());
     res.send(result);
   });
